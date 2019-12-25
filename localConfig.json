@@ -264,7 +264,7 @@
             },
             "FeedbackMask"
         ],
-        "desktop": [ "SampleAbout",
+        "desktop": [ "SampleAbout", "TimeZone",
           {
             "name": "Map",
             "cfg": {
