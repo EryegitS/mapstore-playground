@@ -44,13 +44,17 @@ class TimeZoneComponent extends React.Component {
         let timezone = "Timezone could not be determined.";
         if (this.props.mapCenter) {
             point = [this.props.mapCenter.x.toFixed(6), this.props.mapCenter.y.toFixed(6)];
+            // Using @mapbox/timespace to detirmine timezone from latitude and longitude
             time = ts.getFuzzyLocalTimeFromPoint(this.state.date, point);
             if (time) {
                 timezone = time.toISOString(true) !== null ? time.toISOString(true).split('.')[0] + "Z " : timezone;
                 offset = time.utcOffset() / 60;
+                // timespace package couldn't provide exact format that we want. So I made some costumization.
                 timezone = time.utcOffset() ? timezone + "GMT" + (offset >= 0 ? "+" + offset : offset) : timezone;
                 timezone = time._z.name ? timezone + " " + time._z.name : timezone;
-            } else {
+            } else { // @mapbox/timespace package couldn't provide timezones for all latitude and longitude values.
+                // For example oceans not included the package. But they can be included. Please check: https://github.com/mapbox/timespace
+                // The timezone calculated from latitude in this code block as you mention in issue description.
                 const x = this.props.mapCenter.x % 15;
                 let y = Math.trunc(this.props.mapCenter.x / 15);
                 if (x > 7.500) {
@@ -76,7 +80,6 @@ class TimeZoneComponent extends React.Component {
         </Dialog>;
     }
 }
-
 
 const ConnectedTimeZone = connect((state) => ({
     enabled: state.controls && state.controls.timeZone && state.controls.timeZone.enabled || false,
